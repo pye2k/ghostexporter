@@ -1,19 +1,17 @@
 <?php
 /**
- * This template generates an RSS 2.0 feed for the requested blog's latest posts
+ * This skin generates a JSON dump appropriate for importing into the Ghost blogging platform.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
  * {@link http://b2evolution.net/man/skin-structure}
  *
- * See {@link http://backend.userland.com/rss092}
+ * Otherwise, see README.md for more information about usage and requirements.
  *
- * @todo iTunes podcast tags: http://www.apple.com/itunes/store/podcaststechspecs.html
- * Note: itunes support: .m4a, .mp3, .mov, .mp4, .m4v, and .pdf.
+ * Loosely based on the schema as presented in:
+ * https://github.com/TryGhost/Ghost/blob/master/core/server/data/schema.js
  *
- * @package evoskins
- * @subpackage rss
- *
- * @version $Id: index.main.php 3157 2013-03-06 04:34:44Z fplanque $
+ * The aim was to provide the smallest amount of data required to migrate posts from
+ * b2evolution into Ghost.
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

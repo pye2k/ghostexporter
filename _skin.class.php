@@ -2,13 +2,6 @@
 /**
  * This file implements a class derived of the generic Skin class in order to provide custom code for
  * the skin in this folder.
- *
- * This file is part of the b2evolution project - {@link http://b2evolution.net/}
- *
- * @package skins
- * @subpackage custom
- *
- * @version $Id: _skin.class.php 3328 2013-03-26 11:44:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -19,23 +12,23 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class ghostexporter_Skin extends Skin
 {
-  /**
-	 * Get default name for the skin.
-	 * Note: the admin can customize it.
-	 */
-	function get_default_name()
-	{
-		return 'Ghost Exporter';
-	}
+    /**
+     * Get default name for the skin.
+     * Note: the admin can customize it.
+     */
+    function get_default_name()
+    {
+        return 'Ghost Exporter';
+    }
 
 
-  /**
-	 * Get default type for the skin.
-	 */
-	function get_default_type()
-	{
-		return 'feed';
-	}
+    /**
+     * Get default type for the skin.
+     */
+    function get_default_type()
+    {
+    	return 'feed';
+    }
 }
 
 ?>
