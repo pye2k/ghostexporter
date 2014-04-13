@@ -16,7 +16,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Markdown libraries
-require_once( dirname( __FILE__) . '/html-to-markdown-master/HTML_To_Markdown.php' );
+require_once( dirname( __FILE__) . '/HTML_To_Markdown.php' );
 
 // GUID creation
 function getGUID(){
