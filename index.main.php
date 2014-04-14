@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Markdown libraries
 require_once( dirname( __FILE__) . '/HTML_To_Markdown.php' );
 
-// GUID creation
+// GUID creation (adapated from http://phptips.info/generate-guid-in-php/)
 function getGUID(){
     if (function_exists('com_create_guid')){
         return com_create_guid();
@@ -39,21 +39,16 @@ function getGUID(){
 // Init the MainList object:
 init_MainList( $Blog->get_setting('posts_per_feed') );
 
-$meta = array('exported_on' => time(), 'version' => '002');
-//echo json_encode($meta);
+// Variables used to build the DOM later on
+$posts = array(); // Tracks the list of individual posts
+$tag_name_to_id = array(); // Maintains the relationship of tag_name => tag_id
+$tag_name_to_url = array(); // Maintains the relationship of tag_name => tag_url
+$post_to_tags = array(); // Maintains the relationship of post_id => array(tag_id)
 
-$posts = array();
-$post_id = 2; // keep track of post_ids
-
-// Maintains the relationship of tag_name => tag_id
-$tag_name_to_id = array();
-$tag_id = 5; // keep track of tag_ids
-
-// Maintains the relationship of tag_name => tag_url
-$tag_name_to_url = array();
-
-// Maintains the relationship of post_id => array(tag_id)
-$post_to_tags = array();
+// Variables used as the IDs of various things.
+// These don't actually matter outside the context of the exported JSON since they're stripped during import.
+$post_id = 1;
+$tag_id = 1;
 
 // Build up each post object
 while ( $Item = & mainlist_get_item() )
@@ -131,7 +126,8 @@ foreach ($post_to_tags as $post_id => $tag_list)
 	}
 }
 
-
+// Build up the JSON DOM
+$meta = array('exported_on' => time(), 'version' => '002'); // Ghost metadata. This is based on the version 002 parser.
 $data = array( 'posts' => $posts, 'tags' => $tags, 'posts_tags' => $posts_tags );
 $export = array( 'meta' => $meta, 'data' => $data );
 echo json_encode($export, JSON_PRETTY_PRINT);
