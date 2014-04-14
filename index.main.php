@@ -61,6 +61,7 @@ while ( $Item = & mainlist_get_item() )
 	$item['id'] = $post_id++;
 	$item['language'] = $Blog->locale;
 	$content = $Item->get_prerendered_content("htmlbody");
+	$content = str_replace( '<code class="codespan">', '<code>', $content ); // pre-process code tags
 	$item['markdown'] = (new HTML_To_Markdown($content))->output();
 	$item['page'] = 0;
 	$item['published_at'] = $item['created_at'];
