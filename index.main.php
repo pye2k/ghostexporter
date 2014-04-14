@@ -45,12 +45,17 @@ $meta = array('exported_on' => time(), 'version' => '002');
 $posts = array();
 $post_id = 2; // keep track of post_ids
 
-$item_tags = array();
+// Maintains the relationship of tag_name => tag_id
+$tag_name_to_id = array();
 $tag_id = 5; // keep track of tag_ids
 
-$tag_urls = array();
-$item_posts_tags = array();
+// Maintains the relationship of tag_name => tag_url
+$tag_name_to_url = array();
 
+// Maintains the relationship of post_id => array(tag_id)
+$post_to_tags = array();
+
+// Build up each post object
 while ( $Item = & mainlist_get_item() )
 {
 	$item = array();
@@ -58,68 +63,53 @@ while ( $Item = & mainlist_get_item() )
 	$item['created_at'] = trim( $Item->get_issue_date( array( 'date_format' => 'c', 'use_GMT' => true) ) );
 	$item['created_by'] = 1;
 	$item['featured'] = ($Item->is_featured() ? 1 : 0);
-	$content = $Item->get_prerendered_content("htmlbody");
-	//$item['html'] = $content;
 	$item['id'] = $post_id++;
-	$item['image'] = NULL;
 	$item['language'] = $Blog->locale;
+	$content = $Item->get_prerendered_content("htmlbody");
 	$item['markdown'] = (new HTML_To_Markdown($content))->output();
-	$item['meta_description'] = NULL;
-	$item['meta_title'] = NULL;
 	$item['page'] = 0;
 	$item['published_at'] = $item['created_at'];
-	$item['published_by'] = 1;
 	$item['slug'] = $Item->urltitle;
 	$item['status'] = $Item->get_status_raw();
 	$item['title'] = $Item->get_title( array( 'format' => 'xml', 'link_type' => 'none') );
-	$item['updated_at'] = $item['created_at'];
-	$item['updated_by'] = 1;
 	$item['uuid'] = getGUID();
 
-	//var_dump($item);
-	//var_dump($Item->get_Chapters());
+	// Chapters in b2evolution == tags in Ghost
 	foreach ($Item->get_Chapters() as $Chapter)
 	{
 		$tag_name = $Chapter->dget('name');
-		if (!array_key_exists($tag_name, $item_tags)) {
-			$item_tags[$tag_name] = $tag_id++;
+		if (!array_key_exists($tag_name, $tag_name_to_id)) {
+			// associate the tag_name to a tag_id
+			$tag_name_to_id[$tag_name] = $tag_id++;
 			
-			$tag_urls[$tag_name] = $Chapter->dget('urlname');
-
+			// associate the tag name to a url
+			$tag_name_to_url[$tag_name] = $Chapter->dget('urlname');
 		}
 
-		$pt = $item_posts_tags[$item['id']];
+		// associate the item_id to one or more tag_name
+		$pt = $post_to_tags[$item['id']];
 		if (!isset($pt)) {
 			$pt = array();
 		}
 
-		array_push( $pt, $item_tags[$tag_name] );
-		$item_posts_tags[$item['id']] = $pt;
+		array_push( $pt, $tag_name_to_id[$tag_name] );
+		$post_to_tags[$item['id']] = $pt;
 	}
 
+	// add the post object into the list of posts
 	array_push($posts, $item);
 }
-//var_dump($posts);
-//var_dump($item_tags);
-//var_dump($tag_urls);
-//var_dump($item_posts_tags);
 
-// create tags
+// create tags for ghost
 $tags = array();
-foreach ($item_tags as $key => $value)
+foreach ($tag_name_to_id as $tag_name => $tag_id)
 {
 	$tag_item = array();
 	$tag_item['created_at'] = '1970-01-01T00:00:00.000Z';
 	$tag_item['created_by'] = 1;
-	$tag_item['description'] = NULL;
-	$tag_item['id'] = $value;
-	$tag_item['meta_description'] = NULL;
-	$tag_item['meta_title'] = NULL;
-	$tag_item['name'] = $key;
-	$tag_item['parent_id'] = NULL;
-	$tag_item['slug'] = $tag_urls[$key];
-	$tag_item['updated_at'] = $tag_item['created_at'];
-	$tag_item['updated_by'] = 1;
+	$tag_item['id'] = $tag_id;
+	$tag_item['name'] = $tag_name;
+	$tag_item['slug'] = $tag_name_to_url[$tag_name];
 	$tag_item['uuid'] = getGUID();
 
 	array_push($tags, $tag_item);
@@ -128,14 +118,14 @@ foreach ($item_tags as $key => $value)
 // link up posts to tags
 $posts_tags = array();
 $posts_tags_id = 5;
-foreach ($item_posts_tags as $key => $value)
+foreach ($post_to_tags as $post_id => $tag_list)
 {
-	foreach ($value as $v)
+	foreach ($tag_list as $tag_id)
 	{
 		$posts_tags_item = array();
 		$posts_tags_item['id'] = $posts_tags_id++;
-		$posts_tags_item['post_id'] = $key;
-		$posts_tags_item['tag_id'] = $v;
+		$posts_tags_item['post_id'] = $post_id;
+		$posts_tags_item['tag_id'] = $tag_id;
 
 		array_push($posts_tags, $posts_tags_item);
 	}
