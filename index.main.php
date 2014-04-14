@@ -60,10 +60,16 @@ while ( $Item = & mainlist_get_item() )
 	$item['featured'] = ($Item->is_featured() ? 1 : 0);
 	$item['id'] = $post_id++;
 	$item['language'] = $Blog->locale;
+
+	// get the pre-rendered content; then pre-process it before it gets converted to Markdown
 	$content = $Item->get_prerendered_content("htmlbody");
 	$content = str_replace( '<code class="codespan">', '<code>', $content ); // pre-process code tags
 	$content = str_replace( '<span>', '', $content ); // pre-process span tags
 	$content = str_replace( '</span>', '', $content ); // pre-process /span tags
+
+	$params = array( 'before_image' => '', 'after_image' => '' );
+	$content = $Item->render_inline_images($content, $params); // pre-process the img tags
+
 	$item['markdown'] = (new HTML_To_Markdown($content))->output();
 	$item['page'] = 0;
 	$item['published_at'] = $item['created_at'];
